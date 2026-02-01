@@ -71,6 +71,7 @@ class NoBianExampleController:
                 return JSONResponse(status_code=204, content=None)
             
             if not result.is_success:
+                self._logger.warning(f"Trace:[{str(trace_model)}] Result:[{str(result.validation_values)}]")
                 return JSONResponse(
                     status_code=result.status,
                     content=jsonable_encoder(EasyResponseHelper.warning_response(result.validation_values), exclude_none=True)
@@ -85,7 +86,7 @@ class NoBianExampleController:
             return JSONResponse(status_code=408, content=None)
         
         except Exception as e:        
-            self._logger.error(str(e) + " in "+traceback.format_exc().replace('\n',' ').strip())
+            self._logger.error(str(e) + f". Trace:[{str(trace_model)}] in "+traceback.format_exc().replace('\n',' ').strip())
             await queue_sender.push_error(request_model, error=e)
             return JSONResponse(
                 status_code=500,
