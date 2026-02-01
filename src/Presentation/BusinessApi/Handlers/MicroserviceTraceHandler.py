@@ -11,6 +11,7 @@ from uuid import uuid4
 class MicroserviceTraceHandler:
     def __init__(self, container: MicroserviceCallMemoryQueue) -> None:
         self._container: MicroserviceCallMemoryQueue = container
+        self._request_datetime: datetime = datetime.utcnow()
         self._logger = BusinessApiLogger.set_logger().getChild(self.__class__.__name__)
 
     async def push_success(self, request_data: RequestInputModel, response: Any, status_code: int) -> None:
@@ -30,8 +31,7 @@ class MicroserviceTraceHandler:
         channel_id: str = headers.get("channel-identification", "")
         device_id: str = headers.get("device-identification", "")
         request_url = str(request.url.path)
-        method = request.method
-        request_datetime: datetime = datetime.utcnow()
+        method = request.method        
         
         # Capturar payload del request
         request_payload = None
@@ -74,7 +74,7 @@ class MicroserviceTraceHandler:
             OperationName=operation_name,
             RequestUrl=request_url,
             RequestPayload=request_payload,
-            RequestDatetime=request_datetime,
+            RequestDatetime=self._request_datetime,
             ResponseStatusCode=status_code,
             ResponsePayload=response_payload,
             ResponseDatetime=datetime.utcnow()

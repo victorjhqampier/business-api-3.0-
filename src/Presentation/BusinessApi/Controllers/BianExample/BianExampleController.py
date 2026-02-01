@@ -66,7 +66,7 @@ class BianExampleController:
         )        
         try:
             async with asyncio.timeout(ctx.remaining()):
-                #await asyncio.sleep(9)
+                #await asyncio.sleep(8)
                 result: EasyResult = await example_usecase.get_data_async(trace_model, body)
                 await queue_sender.push_success(request_model, response=result, status_code=result.status)          
             
