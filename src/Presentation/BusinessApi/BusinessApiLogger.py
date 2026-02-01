@@ -3,7 +3,7 @@ import logging
 class BusinessApiLogger:
     @staticmethod
     def set_logger() -> logging.Logger:
-        arify_consumer_logger = logging.getLogger('presentation')
+        arify_consumer_logger = logging.getLogger('This')
         arify_consumer_logger.setLevel(logging.INFO)
 
         # Create console handler if it doesn't exist

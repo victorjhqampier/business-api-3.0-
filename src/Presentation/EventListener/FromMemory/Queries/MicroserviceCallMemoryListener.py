@@ -65,7 +65,7 @@ class MicroserviceCallMemoryListener:
 
                         await asyncio.sleep(random.randint(0, 2))
                         
-                        self._logger.warning(f"IDENTITY>> {event.Identity} START>> {event.RequestDatetime} END>> {event.ResponseDatetime}")
+                        self._logger.warning(f"New mem queue event detected > Requst start: [{event.RequestDatetime}] end: [{event.ResponseDatetime}]")
                     
             except Exception as e:
                 self._logger.error(f"Error procesando eventos: {e}")
