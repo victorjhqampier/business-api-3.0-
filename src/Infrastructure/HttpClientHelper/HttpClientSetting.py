@@ -1,7 +1,5 @@
 from Domain.Commons.CoreServices import CoreServices as Services
-from Domain.Interfaces.IHttpClientInfrastructure import IHttpClientInfrastructure
 from Infrastructure.HttpClientHelper.HttpClientConnector import HttpClientConnector
-from Infrastructure.HttpClientHelper.HttpClientInfrastructure import HttpClientInfrastructure
 
 # ********************************************************************************************************          
 # * Copyright © 2025 Arify Labs - All rights reserved.   
@@ -19,7 +17,6 @@ class HttpClientSetting:
 
     @classmethod
     def add_services(self) -> None:
-        Services.add_singleton_dependency(IHttpClientInfrastructure, HttpClientInfrastructure)
 
         # Added instance on singleton
         Services.add_singleton_instance(HttpClientConnector(timeout_sec=15))

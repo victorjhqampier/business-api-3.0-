@@ -40,7 +40,7 @@ class ExampleUsecase:
         
         # Ejemplo de llamada en paralelo
         result_1_task = self.__fake_api.get_user_async(random.randint(1, 10))
-        result_2_task = self.__fake_api.get_user_async(random.randint(1, 10))
+        result_2_task = self.__fake_api.get_title_async(random.randint(1, 10))
         result_1, result_2  = await asyncio.gather(result_1_task, result_2_task)
 
         if not result_1 or not result_2 :

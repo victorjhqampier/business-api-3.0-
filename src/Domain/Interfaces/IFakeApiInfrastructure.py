@@ -7,3 +7,7 @@ class IFakeApiInfrastructure(ABC):
     @abstractmethod
     async def get_user_async(self,id:int) -> Optional[FakeApiEntity]:
         pass
+
+    @abstractmethod
+    async def get_title_async(self,id:int) -> Optional[FakeApiEntity]:
+        pass

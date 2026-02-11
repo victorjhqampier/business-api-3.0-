@@ -6,7 +6,6 @@ import json
 from Domain.Entities.Internals.MicroserviceCallTraceEntity import MicroserviceCallTraceEntity
 from Domain.Containers.MemoryEvents.MicroserviceCallMemoryQueue import MicroserviceCallMemoryQueue
 from Domain.Entities.HttpResponseEntity import HttpResponseEntity
-from Domain.Interfaces.IHttpClientInfrastructure import IHttpClientInfrastructure
 from Infrastructure.HttpClientHelper.HttpClientConnector import HttpClientConnector
 from Domain.Commons.CoreServices import CoreServices as Services
 
@@ -22,9 +21,9 @@ from Domain.Commons.CoreServices import CoreServices as Services
 # * 
 # **********************************************************************************************************
 
-class HttpClientInfrastructure(IHttpClientInfrastructure):
-    def __init__(self):
-        self.__ApiClient: HttpClientConnector = Services.get_instance(HttpClientConnector)
+class HttpClientBuilder:
+    def __init__(self, http_connector:HttpClientConnector, logger:InfrastructureLogger) -> None:
+        self.__ApiClient: HttpClientConnector = http_connector #HttpClientConnector = Services.get_instance(HttpClientConnector)
         self.__base_url: str = ''
         self.__endpoint: str = ''
         self.__headers: dict = {}
@@ -35,47 +34,47 @@ class HttpClientInfrastructure(IHttpClientInfrastructure):
         self.__container: Optional[MicroserviceCallMemoryQueue] = None
         self.__operation_name: str = ''
         self.__start_datetime: datetime = datetime.utcnow()
-        self._logger = InfrastructureLogger.set_logger().getChild(self.__class__.__name__)
+        self._logger = logger #InfrastructureLogger.set_logger().getChild(self.__class__.__name__)
 
-    def timeout(self, timeout: int) -> "HttpClientInfrastructure":
+    def timeout(self, timeout: int) -> "HttpClientBuilder":
         # No está en la interfaz, pero es adicional si lo deseas
         self.__ApiClient.timeout_sec = timeout
         return self
 
-    def http(self, base_url: str) -> "HttpClientInfrastructure":
+    def http(self, base_url: str) -> "HttpClientBuilder":
         self.__base_url = base_url.rstrip('/')
         return self
 
-    def endpoint(self, endpoint: str) -> "HttpClientInfrastructure":
+    def endpoint(self, endpoint: str) -> "HttpClientBuilder":
         self.__endpoint = endpoint.lstrip('/')
         return self
 
-    def header(self, key: str, value: str) -> "HttpClientInfrastructure":
+    def header(self, key: str, value: str) -> "HttpClientBuilder":
         self.__headers[key] = value
         return self
 
-    def authorization(self, key: str, value: str) -> "HttpClientInfrastructure":
+    def authorization(self, key: str, value: str) -> "HttpClientBuilder":
         # Método adicional, no en la interfaz
         self.__headers['Authorization'] = f"{key} {value}"
         return self
 
-    def headers(self, headers: Dict[str, str]) -> "HttpClientInfrastructure":
+    def headers(self, headers: Dict[str, str]) -> "HttpClientBuilder":
         self.__headers.update(headers)
         return self
 
-    def param(self, key: str, value: str) -> "HttpClientInfrastructure":
+    def param(self, key: str, value: str) -> "HttpClientBuilder":
         self.__params[key] = value
         return self
 
-    def params(self, params: Dict[str, str]) -> "HttpClientInfrastructure":
+    def params(self, params: Dict[str, str]) -> "HttpClientBuilder":
         self.__params.update(params)
         return self
 
-    def query(self, key: str, value: str) -> "HttpClientInfrastructure":
+    def query(self, key: str, value: str) -> "HttpClientBuilder":
         self.__query[key] = value
         return self
 
-    def queries(self, queries: Dict[str, str]) -> "HttpClientInfrastructure":
+    def queries(self, queries: Dict[str, str]) -> "HttpClientBuilder":
         self.__query.update(queries)
         return self
 
@@ -150,7 +149,7 @@ class HttpClientInfrastructure(IHttpClientInfrastructure):
         await self.__ApiClient.close()
     
      # Memory queue functionality - optimized implementation
-    def with_memory_queue(self, queue: MicroserviceCallMemoryQueue, operation_name: str, keyword: Optional[str] = None) -> "HttpClientInfrastructure":
+    def with_memory_queue(self, queue: MicroserviceCallMemoryQueue, operation_name: str, keyword: Optional[str] = None) -> "HttpClientBuilder":
         self.__memory_enabled = True
         self.__container = queue
         self.__operation_name = operation_name
@@ -158,7 +157,7 @@ class HttpClientInfrastructure(IHttpClientInfrastructure):
         return self
 
     # Resetea el estado de memory queue para reutilizar la instancia. Útil para optimizar recursos cuando se reutiliza el cliente.
-    def _reset_memory_state(self) -> "HttpClientInfrastructure":
+    def _reset_memory_state(self) -> "HttpClientBuilder":
         self.__memory_enabled = False
         self.__container = None
         self.__operation_name = ''
